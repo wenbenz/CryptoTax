@@ -1,0 +1,4 @@
+"Transaction Type","Date","Amount Debited","Debit Currency","Amount Credited","Credit Currency","Buy / Sell Rate","Direction","Spot Rate","Source / Destination","Blockchain Transaction ID"
+"fiat funding","2021-06-01T04:37:12+00",,,800,"CAD",,"credit",,"abcd@email.com",
+"purchase/sale","2021-06-01T04:48:51+00",800,"CAD",0.01777697,"BTC","45002.0302","purchase",,,
+"crypto cashout","2021-06-01T04:52:39+00",0.01777697,"BTC",,,,"debit","44409.0215","address1","blockchainid1"
