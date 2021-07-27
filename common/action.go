@@ -1,4 +1,4 @@
-package cryptotax
+package common
 
 //Currencies
 const (

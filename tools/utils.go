@@ -1,4 +1,4 @@
-package cryptotax
+package tools
 
 import (
 	"encoding/csv"
