@@ -6,35 +6,27 @@ import (
 	"time"
 
 	"github.com/wenbenz/CryptoTax/common"
-	"github.com/wenbenz/CryptoTax/tools"
 )
 
-//TODO: parameterize this.
+//TODO: find a way to set these
 const (
-	SHAKEPAY_BTC_ADDR = "BTC_ADDR"
-	SHAKEPAY_ETH_ADDR = "ETH_ADDR"
+	SHAKEPAY_BTC_ADDR = "SHAKEPAY_BTC_ADDR"
+	SHAKEPAY_ETH_ADDR = "SHAKEPAY_ETH_ADDR"
 )
 
 const SHAKEPAY_TIME_FORMAT = "2006-01-02T15:04:05-07"
 
-func GetEventsFromCSV(path string) ([]common.Event, error) {
-	lines, err := tools.ReadCsv(path)
-	if err != nil {
-		return nil, err
+func processLine(line []string) *common.Event {
+	category := getCategory(line)
+	return &common.Event{
+		Time:   getTimestamp(line),
+		Type:   category,
+		Debit:  getDebit(line, category),
+		Credit: getCredit(line, category),
+		Metadata: map[string]interface{}{
+			common.SOURCE: "Shakepay",
+		},
 	}
-
-	// parse lines
-	var EventsToReturn []common.Event
-	for _, line := range lines[1:] {
-		category := getCategory(line)
-		EventsToReturn = append(EventsToReturn, common.Event{
-			Time:   getTimestamp(line),
-			Type:   category,
-			Debit:  getDebit(line, category),
-			Credit: getCredit(line, category),
-		})
-	}
-	return EventsToReturn, nil
 }
 
 func getCategory(row []string) string {
@@ -80,12 +72,7 @@ func getDebit(row []string, category string) common.Action {
 		}
 	}
 	rate := getRate(row, currency)
-	return common.Action{
-		address,
-		currency,
-		amount,
-		amount * rate,
-	}
+	return common.NewAction(address, currency, amount, amount*rate)
 }
 
 //TODO: Missing functionality:
@@ -109,12 +96,7 @@ func getCredit(row []string, category string) common.Action {
 			address = SHAKEPAY_ETH_ADDR
 		}
 	}
-	return common.Action{
-		address,
-		currency,
-		amount,
-		amount * rate,
-	}
+	return common.NewAction(address, currency, amount, amount*rate)
 }
 
 func getRate(row []string, currency string) float64 {

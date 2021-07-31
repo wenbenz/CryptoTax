@@ -238,6 +238,12 @@ github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
+github.com/wenbenz/go-nicehash v0.0.0-20210729010413-a0e2d9168dcb h1:A1/VLiDKriuAlXKIddE9cu/49S2J80yPaHioQv/V7rU=
+github.com/wenbenz/go-nicehash v0.0.0-20210729010413-a0e2d9168dcb/go.mod h1:5OLEpkJ7JTfYK0eI1IhfXcGYIJXyLjf7i1ckJwAImac=
+github.com/wenbenz/go-nicehash v0.0.0-20210729014402-609710c642b5 h1:1wSqbND7EvgYI0JU5eEnrVQ2gTPMduRQJ7Uk4LCmriM=
+github.com/wenbenz/go-nicehash v0.0.0-20210729014402-609710c642b5/go.mod h1:+UCtZXrx5/GDr9jrI3FIEXu1i6TK7mJ56Oj7Q0YWtu8=
+github.com/wenbenz/go-nicehash v0.0.0-20210730011334-3f7958fc6d5c h1:1rqkc33bUNg62/aBfZ171tsslJKl74KaNyUEZ4HNBHE=
+github.com/wenbenz/go-nicehash v0.0.0-20210730011334-3f7958fc6d5c/go.mod h1:+UCtZXrx5/GDr9jrI3FIEXu1i6TK7mJ56Oj7Q0YWtu8=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
