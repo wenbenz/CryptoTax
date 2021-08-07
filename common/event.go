@@ -7,10 +7,10 @@ const (
 	BUY           = "buy"
 	SELL          = "sell"
 	DEPOSIT       = "deposit"
+	WITHDRAW      = "withdraw"
 	EXCHANGE_FULL = "exchange"
 	EXCHANGE_SELL = "exchange_sell"
 	EXCHANGE_BUY  = "exchange_buy"
-	TRANSFER      = "transfer"
 	FEE           = "fee"
 	UNKNOWN       = "unknown"
 
@@ -32,15 +32,6 @@ type Action struct {
 	Currency string
 	Amount   float64
 	CadValue float64
-}
-
-func NewAction(addr, currency string, amt, cad float64) Action {
-	return Action{
-		Address:  addr,
-		Currency: currency,
-		Amount:   amt,
-		CadValue: cad,
-	}
 }
 
 //An event represents any crypto event, containing:
