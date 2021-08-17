@@ -7,5 +7,5 @@ require (
 	github.com/go-kit/kit v0.11.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
-	github.com/wenbenz/go-nicehash v0.0.0-20210730011334-3f7958fc6d5c // indirect
+	github.com/wenbenz/go-nicehash v0.0.0-20210810062502-0475174604b4 // indirect
 )

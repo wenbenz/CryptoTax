@@ -2,13 +2,19 @@ package nicehash
 
 import (
 	"io"
+	"math"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/wenbenz/CryptoTax/common"
 )
 
-const NICEHASH_TIME_FORMAT = "2006-01-02 15:04:05 MST"
+const (
+	NICEHASH_TIME_FORMAT = "2006-01-02 15:04:05 MST"
+	PURPOSE              = "purpose"
+	SOURCE               = "source"
+)
 
 type CsvStreamReader struct {
 	Address  string
@@ -16,13 +22,19 @@ type CsvStreamReader struct {
 	iterator *common.CsvIterator
 }
 
-func NewCsvStreamReader(r io.Reader, addr, currency string) *CsvStreamReader {
+func NewCsvStreamReader(r io.Reader, addr string) *CsvStreamReader {
 	reader := CsvStreamReader{
-		Address:  addr,
-		Currency: currency,
+		Address: addr,
 	}
 	reader.iterator = common.NewCsvIterator(r, reader.processLineStrategy)
-	reader.iterator.Stream.Read()
+	headers, err := reader.iterator.Stream.Read()
+	if err != nil {
+		return nil
+	}
+	currency := headers[2]
+	currency = strings.TrimLeft(currency, "Amount (")
+	currency = strings.TrimRight(currency, ")")
+	reader.Currency = currency
 	return &reader
 }
 
@@ -45,39 +57,41 @@ func (reader *CsvStreamReader) processLineStrategy(s []string) (*common.Event, e
 		return nil, err
 	}
 
+	purpose := s[1]
 	event := common.Event{
-		Time: eventTime,
+		Time:   eventTime,
+		Debit:  common.Action{},
+		Credit: common.Action{},
 		Metadata: map[string]interface{}{
-			common.SOURCE: "NiceHash report" + reader.Address, //TODO: replace with report ID
+			SOURCE:  "Nicehash report",
+			PURPOSE: purpose,
 		},
 	}
+	data := common.Action{
+		Address:  reader.Address,
+		Currency: reader.Currency,
+		Amount:   math.Abs(amount),
+		CadValue: math.Abs(cadVal),
+	}
 
-	switch s[1] {
+	switch purpose {
 	case "Deposit complete", "Hashpower mining":
 		event.Type = common.DEPOSIT
-		event.Debit = common.Action{}
-		event.Credit = common.Action{
-			Address:  reader.Address,
-			Currency: reader.Currency,
-			Amount:   amount,
-			CadValue: cadVal,
-		}
+		event.Credit = data
 	case "Withdrawal complete":
+		// TODO fetch withdrawal destination address.
 		event.Type = common.WITHDRAW
-		event.Debit = common.Action{
-			Address:  reader.Address,
-			Currency: reader.Currency,
-			Amount:   amount,
-			CadValue: cadVal,
-		}
-		event.Credit = common.Action{}
-	case "Hashpower mining fee", "Withdrawal fee":
+		event.Debit = data
+	case "Hashpower mining fee", "Withdrawal fee", "Exchange fee":
 		event.Type = common.FEE
+		event.Debit = data
 	case "Exchange trade":
 		if s[2][0] == '-' {
 			event.Type = common.EXCHANGE_SELL
+			event.Debit = data
 		} else {
 			event.Type = common.EXCHANGE_BUY
+			event.Credit = data
 		}
 	default:
 		event.Type = common.UNKNOWN

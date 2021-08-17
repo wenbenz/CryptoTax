@@ -68,21 +68,21 @@ func TestCsvReader(t *testing.T) {
 			Type:     common.DEPOSIT,
 			Debit:    common.Action{Address: "abcd@email.com"},
 			Credit:   common.Action{Currency: common.CAD, Amount: 800., CadValue: 800.},
-			Metadata: map[string]interface{}{common.SOURCE: testFilePath},
+			Metadata: map[string]interface{}{SOURCE: testFilePath},
 		},
 		{
 			Time:     parseTime("2021-06-01T04:48:51+00"),
 			Type:     common.BUY,
 			Debit:    common.Action{Currency: common.CAD, Amount: 800., CadValue: 800.},
 			Credit:   common.Action{Address: "SHAKEPAY_BTC_ADDR", Currency: common.BTC, Amount: 0.01777697, CadValue: 799.999740804494},
-			Metadata: map[string]interface{}{common.SOURCE: testFilePath},
+			Metadata: map[string]interface{}{SOURCE: testFilePath},
 		},
 		{
 			Time:     parseTime("2021-06-01T04:52:39+00"),
 			Type:     common.WITHDRAW,
 			Debit:    common.Action{Address: "SHAKEPAY_BTC_ADDR", Currency: common.BTC, Amount: 0.01777697, CadValue: 789.4578429348551},
 			Credit:   common.Action{Address: "address1", Currency: common.BTC, Amount: 0.01777697, CadValue: 789.4578429348551},
-			Metadata: map[string]interface{}{common.SOURCE: testFilePath},
+			Metadata: map[string]interface{}{SOURCE: testFilePath},
 		},
 	}
 

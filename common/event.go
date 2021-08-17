@@ -21,9 +21,6 @@ const (
 	NEXO = "NEXO"
 	USDC = "USDC"
 	BUSD = "BUSD"
-
-	//Metadata
-	SOURCE = "source"
 )
 
 //An action is an operation on an address and consists of

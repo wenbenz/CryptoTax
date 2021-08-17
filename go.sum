@@ -244,6 +244,8 @@ github.com/wenbenz/go-nicehash v0.0.0-20210729014402-609710c642b5 h1:1wSqbND7Evg
 github.com/wenbenz/go-nicehash v0.0.0-20210729014402-609710c642b5/go.mod h1:+UCtZXrx5/GDr9jrI3FIEXu1i6TK7mJ56Oj7Q0YWtu8=
 github.com/wenbenz/go-nicehash v0.0.0-20210730011334-3f7958fc6d5c h1:1rqkc33bUNg62/aBfZ171tsslJKl74KaNyUEZ4HNBHE=
 github.com/wenbenz/go-nicehash v0.0.0-20210730011334-3f7958fc6d5c/go.mod h1:+UCtZXrx5/GDr9jrI3FIEXu1i6TK7mJ56Oj7Q0YWtu8=
+github.com/wenbenz/go-nicehash v0.0.0-20210810062502-0475174604b4 h1:BkL+TRfRYW9uMaVe6LBdu1W1gyDAITvBPATIQ/ulFiU=
+github.com/wenbenz/go-nicehash v0.0.0-20210810062502-0475174604b4/go.mod h1:+UCtZXrx5/GDr9jrI3FIEXu1i6TK7mJ56Oj7Q0YWtu8=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=

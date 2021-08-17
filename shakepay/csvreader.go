@@ -11,6 +11,8 @@ import (
 	"github.com/wenbenz/CryptoTax/common"
 )
 
+const SOURCE = "source"
+
 type CsvStreamReader struct {
 	BtcAddr  string
 	EthAddr  string
@@ -62,7 +64,7 @@ func (r *CsvStreamReader) processLineStrategy(line []string) (*common.Event, err
 		Debit:  debit,
 		Credit: credit,
 		Metadata: map[string]interface{}{
-			common.SOURCE: r.source,
+			SOURCE: r.source,
 		},
 	}
 	externalAddr := line[9]
