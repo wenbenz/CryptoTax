@@ -12,13 +12,13 @@ import (
 )
 
 func TestNewCsvStreamReader(t *testing.T) {
-	f, _ := os.Open("testdata/in/btc_short.csv")
+	f, _ := os.Open("testdata/in/btc.csv")
 	reader := NewCsvStreamReader(f, "NICEHASH_BTC_ADDR")
 	assert.Equal(t, "BTC", reader.Currency)
 }
 
 func TestNext(t *testing.T) {
-	f, _ := os.Open("testdata/in/btc_short.csv")
+	f, _ := os.Open("testdata/in/btc.csv")
 	reader := NewCsvStreamReader(f, "NICEHASH_BTC_ADDR")
 
 	for i := 2; i <= 13; i++ {
