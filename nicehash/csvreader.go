@@ -2,12 +2,14 @@ package nicehash
 
 import (
 	"io"
+	"log"
 	"math"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/wenbenz/CryptoTax/common"
+	"github.com/wenbenz/go-nicehash/client"
 )
 
 const (
@@ -20,6 +22,45 @@ type CsvStreamReader struct {
 	Address  string
 	Currency string
 	iterator *common.CsvIterator
+}
+
+func NewCsvStreamReaderFromCredentials(path string, purgeOlderReports bool) *CsvStreamReader {
+	nhc, err := client.NewClientReadFrom("data/nicehash.credentials")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	var reports []client.ReportMetadata
+	reports, err = nhc.GetReportsList()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// purge older reports
+	for i := 0; purgeOlderReports && i < len(reports); i += 1 {
+		nhc.DeleteReport(reports[i].Id)
+	}
+
+	// create report if none exists
+	if len(reports) == 0 {
+		if err = nhc.CreateReport("ALL", "BTC", "CAD", "NONE", time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC), time.Now(), "0", "0"); err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	// wait for report to be generated
+	for reports[0].Status == 0 {
+		reports, err = nhc.GetReportsList()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		log.Println("waiting for report to generate...")
+		time.Sleep(5 * time.Second)
+	}
+	nhs, err := nhc.GetReport(reports[0].Id)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return NewCsvStreamReader(nhs, "NICEHASH_ADDR")
 }
 
 func NewCsvStreamReader(r io.Reader, addr string) *CsvStreamReader {
