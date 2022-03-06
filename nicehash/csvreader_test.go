@@ -25,7 +25,7 @@ func TestNext(t *testing.T) {
 		event, err := reader.Next()
 		assert.Nil(t, err)
 		assert.Equal(t, 2021, event.Time.Year())
-		assert.Less(t, 0, len(event.Type))
+		assert.Less(t, 0, len(event.TransactionType))
 	}
 
 	event, err := reader.Next()
@@ -35,39 +35,28 @@ func TestNext(t *testing.T) {
 
 func TestMining(t *testing.T) {
 	reader := NewCsvStreamReader(
-		stubReader("BTC",
+		stubReader(
+			"BTC",
 			"2021-06-05 08:05:18 GMT,Hashpower mining,0.00001393,45421.21,0.63",
 			"2021-06-05 08:05:18 GMT,Hashpower mining fee,-0.00000028,45421.21,-0.01"),
 		"ADDR")
 
 	expectedEvents := []*common.Event{
 		{
-			Time: parseTime("2021-06-05 08:05:18 GMT"),
-			Type: common.DEPOSIT,
-			Credit: common.Action{
-				Address:  reader.Address,
-				Currency: "BTC",
-				Amount:   0.00001393,
-				CadValue: 0.63,
-			},
-			Metadata: map[string]interface{}{
-				SOURCE:  "Nicehash report",
-				PURPOSE: "Hashpower mining",
-			},
+			Time:            parseTime("2021-06-05 08:05:18 GMT"),
+			TransactionType: common.MINING,
+			Wallet:          reader.Address,
+			Currency:        "BTC",
+			Amount:           0.00001393,
+			CadValue:        0.63,
 		},
 		{
-			Time: parseTime("2021-06-05 08:05:18 GMT"),
-			Type: common.FEE,
-			Debit: common.Action{
-				Address:  reader.Address,
-				Currency: "BTC",
-				Amount:   0.00000028,
-				CadValue: 0.01,
-			},
-			Metadata: map[string]interface{}{
-				SOURCE:  "Nicehash report",
-				PURPOSE: "Hashpower mining fee",
-			},
+			Time:            parseTime("2021-06-05 08:05:18 GMT"),
+			TransactionType: common.FEE,
+			Wallet:          reader.Address,
+			Currency:        "BTC",
+			Amount:           0.00000028,
+			CadValue:        0.01,
 		},
 	}
 
@@ -86,18 +75,12 @@ func TestDeposit(t *testing.T) {
 	event, err := reader.Next()
 	assert.Nil(t, err)
 	assert.Equal(t, &common.Event{
-		Time: parseTime("2021-06-09 04:02:29 GMT"),
-		Type: common.DEPOSIT,
-		Credit: common.Action{
-			Address:  reader.Address,
-			Currency: "BTC",
-			Amount:   0.00700000,
-			CadValue: 277.62,
-		},
-		Metadata: map[string]interface{}{
-			SOURCE:  "Nicehash report",
-			PURPOSE: "Deposit complete",
-		},
+		Time:            parseTime("2021-06-09 04:02:29 GMT"),
+		TransactionType: common.DEPOSIT,
+		Wallet:          reader.Address,
+		Currency:        "BTC",
+		Amount:           0.00700000,
+		CadValue:        277.62,
 	}, event)
 }
 
@@ -110,35 +93,24 @@ func TestWithdrawal(t *testing.T) {
 	event, err := reader.Next()
 	assert.Nil(t, err)
 	assert.Equal(t, &common.Event{
-		Time: parseTime("2021-07-29 17:15:47 GMT"),
-		Type: common.WITHDRAW,
-		Debit: common.Action{
-			Address:  reader.Address,
-			Currency: "BTC",
-			Amount:   0.00100014,
-			CadValue: 49.56,
-		},
-		Metadata: map[string]interface{}{
-			SOURCE:  "Nicehash report",
-			PURPOSE: "Withdrawal complete",
-		},
+		Time:            parseTime("2021-07-29 17:15:47 GMT"),
+		TransactionType: common.WITHDRAW,
+		Wallet:          reader.Address,
+		Currency:        "BTC",
+		Amount:           0.00100014,
+		CadValue:        49.56,
 	}, event)
 	event, err = reader.Next()
 	assert.Nil(t, err)
 	assert.Equal(t, &common.Event{
-		Time: parseTime("2021-07-29 17:15:47 GMT"),
-		Type: common.FEE,
-		Debit: common.Action{
-			Address:  reader.Address,
-			Currency: "BTC",
-			Amount:   0.00000100,
-			CadValue: 0.05,
-		},
-		Metadata: map[string]interface{}{
-			SOURCE:  "Nicehash report",
-			PURPOSE: "Withdrawal fee",
-		},
-	}, event)
+		Time:            parseTime("2021-07-29 17:15:47 GMT"),
+		TransactionType: common.FEE,
+		Wallet:          reader.Address,
+		Currency:        "BTC",
+		Amount:           0.00000100,
+		CadValue:        0.05,
+	},
+		event)
 }
 
 func TestExchange(t *testing.T) {
@@ -149,18 +121,12 @@ func TestExchange(t *testing.T) {
 	sellEvent, err := sellReader.Next()
 	assert.Nil(t, err)
 	assert.Equal(t, &common.Event{
-		Time: parseTime("2021-06-09 16:07:36 GMT"),
-		Type: common.EXCHANGE_SELL,
-		Debit: common.Action{
-			Address:  sellReader.Address,
-			Currency: "BTC",
-			Amount:   0.00358344,
-			CadValue: 142.78,
-		},
-		Metadata: map[string]interface{}{
-			SOURCE:  "Nicehash report",
-			PURPOSE: "Exchange trade",
-		},
+		Time:            parseTime("2021-06-09 16:07:36 GMT"),
+		TransactionType: common.SELL,
+		Wallet:          sellReader.Address,
+		Currency:        "BTC",
+		Amount:           0.00358344,
+		CadValue:        142.78,
 	}, sellEvent)
 
 	buyReader := NewCsvStreamReader(
@@ -171,39 +137,28 @@ func TestExchange(t *testing.T) {
 	buyFeeEvent, err := buyReader.Next()
 	assert.Nil(t, err)
 	assert.Equal(t, &common.Event{
-		Time: parseTime("2021-06-09 16:07:36 GMT"),
-		Type: common.FEE,
-		Debit: common.Action{
-			Address:  sellReader.Address,
-			Currency: "NEXO",
-			Amount:   0.281849560000000000,
-			CadValue: 0.71,
-		},
-		Metadata: map[string]interface{}{
-			SOURCE:  "Nicehash report",
-			PURPOSE: "Exchange fee",
-		},
-	}, buyFeeEvent)
+		Time:            parseTime("2021-06-09 16:07:36 GMT"),
+		TransactionType: common.FEE,
+		Wallet:          sellReader.Address,
+		Currency:        "NEXO",
+		Amount:           0.281849560000000000,
+		CadValue:        0.71,
+	},
+		buyFeeEvent)
 	buyEvent, err := buyReader.Next()
 	assert.Nil(t, err)
 	assert.Equal(t, &common.Event{
-		Time: parseTime("2021-06-09 16:07:36 GMT"),
-		Type: common.EXCHANGE_BUY,
-		Credit: common.Action{
-			Address:  sellReader.Address,
-			Currency: "NEXO",
-			Amount:   56.369911100000000000,
-			CadValue: 142.62,
-		},
-		Metadata: map[string]interface{}{
-			SOURCE:  "Nicehash report",
-			PURPOSE: "Exchange trade",
-		},
+		Time:            parseTime("2021-06-09 16:07:36 GMT"),
+		TransactionType: common.BUY,
+		Wallet:          sellReader.Address,
+		Currency:        "NEXO",
+		Amount:           56.369911100000000000,
+		CadValue:        142.62,
 	}, buyEvent)
 }
 
-func stubReader(currency string, rows ...string) *strings.Reader {
-	headerRow := fmt.Sprintf("Date time,Purpose,Amount (%s),* Exchange rate,Amount (CAD)", currency)
+func stubReader(Coin string, rows ...string) *strings.Reader {
+	headerRow := fmt.Sprintf("Date time,Purpose,Amount (%s),* Exchange rate,Amount (CAD)", Coin)
 	data := append([]string{headerRow}, rows...)
 	return strings.NewReader(strings.Join(data, "\n"))
 }

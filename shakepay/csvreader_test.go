@@ -16,48 +16,21 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-func TestGetCategory(t *testing.T) {
-	assert.Equal(t, common.DEPOSIT, getCategory(rows[1]))
-	assert.Equal(t, common.BUY, getCategory(rows[2]))
-	assert.Equal(t, common.WITHDRAW, getCategory(rows[3]))
-	//TODO: implement and test other Shakepay types.
-	//	currently lack sample from own records.
-}
-
-func TestGetTime(t *testing.T) {
-	testFormat := "15:04:05 2006-01-02"
-	expectedValues := []string{"04:37:12 2021-06-01", "04:48:51 2021-06-01", "04:52:39 2021-06-01"}
-	for i, expected := range expectedValues {
-		actual, err := getTimestamp(rows[i+1])
-		assert.Nil(t, err)
-		assert.Equal(t, expected, actual.Format(testFormat))
-	}
-}
-
-func TestGetDebit(t *testing.T) {
-	expectedActions := []common.Action{
-		{},
-		{Currency: common.CAD, Amount: 800., CadValue: 800.},
-		{Currency: common.BTC, Amount: 0.01777697, CadValue: 789.4578429348551},
-	}
-	for i, expected := range expectedActions {
-		actual, err := getDebit(rows[i+1], getCategory(rows[i+1]))
-		assert.Nil(t, err)
-		assert.Equal(t, expected, actual)
-	}
-}
-
-func TestGetCredit(t *testing.T) {
-	expectedActions := []common.Action{
-		{Currency: common.CAD, Amount: 800., CadValue: 800.},
-		{Currency: common.BTC, Amount: 0.01777697, CadValue: 799.999740804494},
-		{Currency: common.BTC, Amount: 0.01777697, CadValue: 789.4578429348551},
-	}
-	for i, expected := range expectedActions {
-		actual, err := getCredit(rows[i+1], getCategory(rows[i+1]))
-		assert.Nil(t, err)
-		assert.Equal(t, expected, actual)
-	}
+func TestParser(t *testing.T) {
+	// "fiat funding","2021-06-01T04:37:12+00",,,800,"CAD",,"credit",,"abcd@email.com",
+	spEvent, err := parseRow(rows[1])
+	assert.Nil(t, err)
+	assert.Equal(t, shakepayEvent{"fiat funding", parseTime("2021-06-01T04:37:12+00"), 0., "", 800., "CAD", 0., "credit", 0., "abcd@email.com", ""}, spEvent)
+	
+	// "purchase/sale","2021-06-01T04:48:51+00",800,"CAD",0.01777697,"BTC","45002.0302","purchase",,,
+	spEvent, err = parseRow(rows[2])
+	assert.Nil(t, err)
+	assert.Equal(t, shakepayEvent{"purchase/sale", parseTime("2021-06-01T04:48:51+00"), 800., "CAD", 0.01777697, "BTC", 45002.0302, "purchase", 0., "", ""}, spEvent)
+	
+	// "crypto cashout","2021-06-01T04:52:39+00",0.01777697,"BTC",,,,"debit","44409.0215","address1","blockchainid1"
+	spEvent, err = parseRow(rows[3])
+	assert.Nil(t, err)
+	assert.Equal(t, shakepayEvent{"crypto cashout",parseTime("2021-06-01T04:52:39+00"),0.01777697,"BTC",0.,"",0.,"debit",44409.0215,"address1","blockchainid1"}, spEvent)
 }
 
 func TestCsvReader(t *testing.T) {
@@ -65,24 +38,34 @@ func TestCsvReader(t *testing.T) {
 	expected := []*common.Event{
 		{
 			Time:     parseTime("2021-06-01T04:37:12+00"),
-			Type:     common.DEPOSIT,
-			Debit:    common.Action{Address: "abcd@email.com"},
-			Credit:   common.Action{Currency: common.CAD, Amount: 800., CadValue: 800.},
-			Metadata: map[string]interface{}{SOURCE: testFilePath},
+			TransactionType: common.DEPOSIT,
+			Currency: common.CAD,
+			Amount: 800.,
+			CadValue: 800.,
+			Wallet: "abcd@email.com",
 		},
 		{
 			Time:     parseTime("2021-06-01T04:48:51+00"),
-			Type:     common.BUY,
-			Debit:    common.Action{Currency: common.CAD, Amount: 800., CadValue: 800.},
-			Credit:   common.Action{Address: "SHAKEPAY_BTC_ADDR", Currency: common.BTC, Amount: 0.01777697, CadValue: 799.999740804494},
-			Metadata: map[string]interface{}{SOURCE: testFilePath},
+			TransactionType: common.SELL,
+			Currency: common.CAD,
+			Amount: 800.,
+			CadValue: 800.,
+		},
+		{
+			Time:     parseTime("2021-06-01T04:48:51+00"),
+			TransactionType: common.BUY,
+			Currency: common.BTC,
+			Amount: 0.01777697,
+			CadValue: 800.,
 		},
 		{
 			Time:     parseTime("2021-06-01T04:52:39+00"),
-			Type:     common.WITHDRAW,
-			Debit:    common.Action{Address: "SHAKEPAY_BTC_ADDR", Currency: common.BTC, Amount: 0.01777697, CadValue: 789.4578429348551},
-			Credit:   common.Action{Address: "address1", Currency: common.BTC, Amount: 0.01777697, CadValue: 789.4578429348551},
-			Metadata: map[string]interface{}{SOURCE: testFilePath},
+			TransactionType: common.WITHDRAW,
+			Wallet: "address1",
+			Currency: common.BTC,
+			Amount: 0.01777697,
+			CadValue: 789.4578429348551,
+			Comments: "blockchainid1",
 		},
 	}
 
